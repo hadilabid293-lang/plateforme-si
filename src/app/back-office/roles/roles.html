@@ -1,0 +1,368 @@
+<div class="roles-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+
+    <div>
+      <h1>Gestion des rôles</h1>
+      <p>Gestion des rôles et des permissions de la plateforme SI</p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="ouvrirFormulaire()"
+    >
+      + Nouveau rôle
+    </button>
+
+  </div>
+
+
+  <!-- STATISTIQUES -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+
+      <div class="stat-icon">🔐</div>
+
+      <div>
+        <p>Total rôles</p>
+        <h2>{{ totalRoles }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">✅</div>
+
+      <div>
+        <p>Rôles actifs</p>
+        <h2>{{ rolesActifs }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">⛔</div>
+
+      <div>
+        <p>Rôles inactifs</p>
+        <h2>{{ rolesInactifs }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">👥</div>
+
+      <div>
+        <p>Utilisateurs affectés</p>
+        <h2>{{ totalUtilisateurs }}</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FORMULAIRE -->
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <div class="form-header">
+
+        <div>
+
+          <h2>
+            {{ modeModification
+              ? 'Modifier le rôle'
+              : 'Ajouter un rôle'
+            }}
+          </h2>
+
+          <p>
+            {{ modeModification
+              ? 'Modifier les informations du rôle'
+              : 'Créer un nouveau rôle'
+            }}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- NOM -->
+        <div class="form-group">
+
+          <label>Nom du rôle *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="nom"
+            placeholder="Ex : Manager"
+          />
+
+        </div>
+
+
+        <!-- STATUT -->
+        <div class="form-group">
+
+          <label>Statut *</label>
+
+          <select [(ngModel)]="statut">
+
+            <option value="Actif">
+              Actif
+            </option>
+
+            <option value="Inactif">
+              Inactif
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+        <div class="form-group full-width">
+
+          <label>Description *</label>
+
+          <textarea
+            [(ngModel)]="description"
+            rows="4"
+            placeholder="Décrire les responsabilités de ce rôle..."
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOUTONS -->
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()"
+        >
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="enregistrerRole()"
+        >
+          {{ modeModification ? 'Modifier' : 'Enregistrer' }}
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- LISTE DES RÔLES -->
+  <div class="roles-card">
+
+    <!-- HEADER -->
+    <div class="table-header">
+
+      <div>
+
+        <h2>Rôles</h2>
+
+        <p>
+          Liste des rôles disponibles dans la plateforme
+        </p>
+
+      </div>
+
+
+      <!-- FILTRES -->
+      <div class="filters">
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="recherche"
+          placeholder="Rechercher un rôle..."
+        />
+
+
+        <select
+          class="filter-select"
+          [(ngModel)]="filtreStatut"
+        >
+
+          <option value="Tous">
+            Tous les statuts
+          </option>
+
+          <option value="Actif">
+            Actif
+          </option>
+
+          <option value="Inactif">
+            Inactif
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLEAU -->
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Rôle</th>
+
+            <th>Description</th>
+
+            <th>Utilisateurs</th>
+
+            <th>Statut</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            role of rolesFiltres;
+            track role.id
+          ) {
+
+            <tr>
+
+              <!-- RÔLE -->
+              <td>
+
+                <div class="role-name">
+
+                  <div class="role-icon">
+                    🔐
+                  </div>
+
+                  <strong>
+                    {{ role.nom }}
+                  </strong>
+
+                </div>
+
+              </td>
+
+
+              <!-- DESCRIPTION -->
+              <td class="description-cell">
+
+                {{ role.description }}
+
+              </td>
+
+
+              <!-- UTILISATEURS -->
+              <td>
+
+                <span class="users-count">
+                  {{ role.utilisateurs }}
+                </span>
+
+              </td>
+
+
+              <!-- STATUT -->
+              <td>
+
+                <span
+                  class="status"
+                  [class.active]="role.statut === 'Actif'"
+                  [class.inactive]="role.statut === 'Inactif'"
+                >
+                  {{ role.statut }}
+                </span>
+
+              </td>
+
+
+              <!-- ACTIONS -->
+              <td>
+
+                <div class="actions">
+
+                  <button
+                    class="edit-button"
+                    title="Modifier"
+                    (click)="modifierRole(role)"
+                  >
+                    ✏️
+                  </button>
+
+
+                  <button
+                    class="delete-button"
+                    title="Supprimer"
+                    (click)="supprimerRole(role.id)"
+                  >
+                    🗑️
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+
+          <!-- AUCUN RÉSULTAT -->
+          @if (rolesFiltres.length === 0) {
+
+            <tr>
+
+              <td
+                colspan="5"
+                class="empty-message"
+              >
+                Aucun rôle trouvé.
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

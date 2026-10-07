@@ -1,0 +1,432 @@
+<div class="projets-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+
+    <div>
+      <h1>Gestion des projets</h1>
+      <p>Création, suivi et gestion des projets</p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="ouvrirFormulaire()"
+    >
+      + Nouveau projet
+    </button>
+
+  </div>
+
+
+  <!-- FORMULAIRE -->
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <h2>
+        {{ modeModification ? 'Modifier le projet' : 'Nouveau projet' }}
+      </h2>
+
+      <div class="form-grid">
+
+        <!-- NOM -->
+        <div class="form-group">
+
+          <label>Nom du projet *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="nom"
+            placeholder="Ex : Projet ERP"
+          >
+
+        </div>
+
+
+        <!-- RESPONSABLE -->
+        <div class="form-group">
+
+          <label>Responsable *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="responsable"
+            placeholder="Nom du responsable"
+          >
+
+        </div>
+
+
+        <!-- DATE DÉBUT -->
+        <div class="form-group">
+
+          <label>Date de début *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateDebut"
+          >
+
+        </div>
+
+
+        <!-- DATE FIN -->
+        <div class="form-group">
+
+          <label>Date de fin *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateFin"
+          >
+
+        </div>
+
+
+        <!-- BUDGET -->
+        <div class="form-group">
+
+          <label>Budget (DT) *</label>
+
+          <input
+            type="number"
+            [(ngModel)]="budget"
+            min="0"
+            step="100"
+            placeholder="Ex : 100000"
+          >
+
+        </div>
+
+
+        <!-- PROGRESSION -->
+        <div class="form-group">
+
+          <label>Progression (%)</label>
+
+          <input
+            type="number"
+            [(ngModel)]="progression"
+            min="0"
+            max="100"
+            step="1"
+          >
+
+        </div>
+
+
+        <!-- STATUT -->
+        <div class="form-group">
+
+          <label>Statut</label>
+
+          <select [(ngModel)]="statut">
+
+            <option value="En cours">
+              En cours
+            </option>
+
+            <option value="Terminé">
+              Terminé
+            </option>
+
+            <option value="En attente">
+              En attente
+            </option>
+
+            <option value="Annulé">
+              Annulé
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()"
+        >
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="enregistrerProjet()"
+        >
+          {{ modeModification ? 'Enregistrer' : 'Ajouter' }}
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- STATISTIQUES -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        📁
+      </div>
+
+      <div>
+        <p>Total projets</p>
+        <h2>{{ totalProjets }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        🔄
+      </div>
+
+      <div>
+        <p>Projets en cours</p>
+        <h2>{{ projetsEnCours }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        ✅
+      </div>
+
+      <div>
+        <p>Projets terminés</p>
+        <h2>{{ projetsTermines }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        💰
+      </div>
+
+      <div>
+        <p>Budget total</p>
+        <h2>{{ budgetTotal | number:'1.0-0' }} DT</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PROGRESSION MOYENNE -->
+  <div class="average-card">
+
+    <div class="average-header">
+
+      <div>
+        <h2>Progression moyenne</h2>
+        <p>Avancement global des projets</p>
+      </div>
+
+      <strong>
+        {{ progressionMoyenne }}%
+      </strong>
+
+    </div>
+
+    <div class="progress-bar">
+
+      <div
+        class="progress"
+        [style.width.%]="progressionMoyenne"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- TABLEAU -->
+  <div class="projets-card">
+
+    <div class="table-header">
+
+      <h2>Liste des projets</h2>
+
+      <div class="filters">
+
+        <!-- RECHERCHE -->
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="recherche"
+          placeholder="Rechercher un projet..."
+        >
+
+
+        <!-- FILTRE -->
+        <select
+          class="status-filter"
+          [(ngModel)]="filtreStatut"
+        >
+
+          <option value="Tous">
+            Tous les statuts
+          </option>
+
+          <option value="En cours">
+            En cours
+          </option>
+
+          <option value="Terminé">
+            Terminé
+          </option>
+
+          <option value="En attente">
+            En attente
+          </option>
+
+          <option value="Annulé">
+            Annulé
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Projet</th>
+
+          <th>Responsable</th>
+
+          <th>Date début</th>
+
+          <th>Date fin</th>
+
+          <th>Budget</th>
+
+          <th>Progression</th>
+
+          <th>Statut</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        @for (projet of projetsFiltres; track projet.id) {
+
+          <tr>
+
+            <td>
+              <strong>{{ projet.nom }}</strong>
+            </td>
+
+            <td>
+              {{ projet.responsable }}
+            </td>
+
+            <td>
+              {{ projet.dateDebut }}
+            </td>
+
+            <td>
+              {{ projet.dateFin }}
+            </td>
+
+            <td>
+              {{ projet.budget | number:'1.0-0' }} DT
+            </td>
+
+            <td>
+
+              <div class="progress-cell">
+
+                <div class="progress-bar-small">
+
+                  <div
+                    class="progress-small"
+                    [style.width.%]="projet.progression"
+                  ></div>
+
+                </div>
+
+                <span>
+                  {{ projet.progression }}%
+                </span>
+
+              </div>
+
+            </td>
+
+            <td>
+
+              <span
+                class="status"
+                [class.in-progress]="projet.statut === 'En cours'"
+                [class.completed]="projet.statut === 'Terminé'"
+                [class.pending]="projet.statut === 'En attente'"
+                [class.cancelled]="projet.statut === 'Annulé'"
+              >
+                {{ projet.statut }}
+              </span>
+
+            </td>
+
+
+            <td class="actions">
+
+              <button
+                class="edit-button"
+                (click)="modifierProjet(projet)"
+                title="Modifier"
+              >
+                ✏️
+              </button>
+
+              <button
+                class="delete-button"
+                (click)="supprimerProjet(projet.id)"
+                title="Supprimer"
+              >
+                🗑️
+              </button>
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

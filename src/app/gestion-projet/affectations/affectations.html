@@ -1,0 +1,398 @@
+<div class="affectations-page">
+
+  <!-- =========================
+       EN-TÊTE
+  ========================== -->
+  <div class="page-header">
+
+    <div>
+      <h1>Gestion des affectations</h1>
+      <p>Affectation des employés aux différents projets</p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="ouvrirFormulaire()">
+      + Nouvelle affectation
+    </button>
+
+  </div>
+
+
+  <!-- =========================
+       FORMULAIRE
+  ========================== -->
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <h2>
+        {{ modeModification
+          ? 'Modifier une affectation'
+          : 'Nouvelle affectation' }}
+      </h2>
+
+      <div class="form-grid">
+
+        <!-- EMPLOYÉ -->
+        <div class="form-group">
+
+          <label>Employé *</label>
+
+          <select [(ngModel)]="employeId">
+
+            <option [ngValue]="0">
+              Sélectionner un employé
+            </option>
+
+            @for (
+              employeItem of employes;
+              track employeItem.id
+            ) {
+
+              <option [ngValue]="employeItem.id">
+                {{ employeItem.nom }}
+                {{ employeItem.prenom }}
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+
+        <!-- PROJET -->
+        <div class="form-group">
+
+          <label>Projet *</label>
+
+          <select [(ngModel)]="projetId">
+
+            <option [ngValue]="0">
+              Sélectionner un projet
+            </option>
+
+            @for (
+              projetItem of projets;
+              track projetItem.id
+            ) {
+
+              <option [ngValue]="projetItem.id">
+                {{ projetItem.nom }}
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+
+        <!-- RÔLE -->
+        <div class="form-group">
+
+          <label>Rôle</label>
+
+          <input
+            type="text"
+            [(ngModel)]="role"
+            placeholder="Ex : Développeur">
+
+        </div>
+
+
+        <!-- TAUX -->
+        <div class="form-group">
+
+          <label>Taux d'affectation (%)</label>
+
+          <input
+            type="number"
+            [(ngModel)]="tauxAffectation"
+            min="0"
+            max="100"
+            placeholder="100">
+
+        </div>
+
+
+        <!-- DATE -->
+        <div class="form-group">
+
+          <label>Date d'affectation *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateAffectation">
+
+        </div>
+
+      </div>
+
+
+      <!-- BOUTONS -->
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()">
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="enregistrerAffectation()">
+
+          {{ modeModification
+            ? 'Modifier'
+            : 'Enregistrer' }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- =========================
+       STATISTIQUES
+  ========================== -->
+  <div class="stats-grid">
+
+    <!-- TOTAL -->
+    <div class="stat-card">
+
+      <div class="stat-icon">📋</div>
+
+      <div>
+        <p>Total affectations</p>
+        <h2>{{ totalAffectations }}</h2>
+      </div>
+
+    </div>
+
+
+    <!-- EMPLOYÉS -->
+    <div class="stat-card">
+
+      <div class="stat-icon">👤</div>
+
+      <div>
+        <p>Employés affectés</p>
+        <h2>{{ employesAffectes }}</h2>
+      </div>
+
+    </div>
+
+
+    <!-- PROJETS -->
+    <div class="stat-card">
+
+      <div class="stat-icon">📁</div>
+
+      <div>
+        <p>Projets concernés</p>
+        <h2>{{ projetsAvecAffectations }}</h2>
+      </div>
+
+    </div>
+
+
+    <!-- TAUX MOYEN -->
+    <div class="stat-card">
+
+      <div class="stat-icon">📊</div>
+
+      <div>
+        <p>Taux moyen</p>
+
+        <h2>
+          {{ tauxMoyen | number:'1.0-2' }} %
+        </h2>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       TABLEAU
+  ========================== -->
+  <div class="affectations-card">
+
+    <div class="table-header">
+
+      <h2>Liste des affectations</h2>
+
+      <div class="filters">
+
+        <!-- RECHERCHE -->
+        <input
+          class="search-input"
+          type="text"
+          [(ngModel)]="recherche"
+          placeholder="Rechercher un employé, projet ou rôle...">
+
+
+        <!-- FILTRE PROJET -->
+        <select
+          class="project-filter"
+          [(ngModel)]="filtreProjet">
+
+          <option value="Tous">
+            Tous les projets
+          </option>
+
+          @for (
+            projetItem of projets;
+            track projetItem.id
+          ) {
+
+            <option [value]="projetItem.nom">
+              {{ projetItem.nom }}
+            </option>
+
+          }
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Employé</th>
+          <th>Projet</th>
+          <th>Rôle</th>
+          <th>Date d'affectation</th>
+          <th>Taux</th>
+          <th>Actions</th>
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        @for (
+          affectation of affectationsFiltrees;
+          track affectation.id
+        ) {
+
+          <tr>
+
+            <!-- EMPLOYÉ -->
+            <td>
+
+              <strong>
+                {{ affectation.employe_prenom }}
+                {{ affectation.employe_nom }}
+              </strong>
+
+            </td>
+
+
+            <!-- PROJET -->
+            <td>
+
+              <span class="project-badge">
+                {{ affectation.projet_nom }}
+              </span>
+
+            </td>
+
+
+            <!-- RÔLE -->
+            <td>
+              {{ affectation.role || '-' }}
+            </td>
+
+
+            <!-- DATE -->
+            <td>
+              {{ affectation.date_affectation }}
+            </td>
+
+
+            <!-- TAUX -->
+            <td>
+
+              <div class="taux-cell">
+
+                <div class="progress-bar-small">
+
+                  <div
+                    class="progress-small"
+                    [style.width.%]="affectation.taux_affectation">
+                  </div>
+
+                </div>
+
+                <span>
+                  {{ affectation.taux_affectation }}%
+                </span>
+
+              </div>
+
+            </td>
+
+
+            <!-- ACTIONS -->
+            <td class="actions">
+
+              <button
+                class="edit-button"
+                title="Modifier"
+                (click)="modifierAffectation(affectation)">
+                ✏️
+              </button>
+
+              <button
+                class="delete-button"
+                title="Supprimer"
+                (click)="supprimerAffectation(affectation.id)">
+                🗑️
+              </button>
+
+            </td>
+
+          </tr>
+
+        }
+
+
+        <!-- AUCUNE AFFECTATION -->
+        @if (affectationsFiltrees.length === 0) {
+
+          <tr>
+
+            <td
+              colspan="6"
+              style="text-align: center; padding: 30px;">
+
+              Aucune affectation trouvée.
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

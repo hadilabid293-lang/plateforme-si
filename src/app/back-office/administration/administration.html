@@ -1,0 +1,422 @@
+<div class="admin-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+
+    <div>
+      <h1>Administration</h1>
+      <p>Gestion des utilisateurs de la plateforme SI</p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="ouvrirFormulaire()"
+    >
+      + Nouvel utilisateur
+    </button>
+
+  </div>
+
+
+  <!-- STATISTIQUES -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+
+      <div class="stat-icon">👥</div>
+
+      <div>
+        <p>Total utilisateurs</p>
+        <h2>{{ totalUtilisateurs }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">✅</div>
+
+      <div>
+        <p>Utilisateurs actifs</p>
+        <h2>{{ utilisateursActifs }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">⛔</div>
+
+      <div>
+        <p>Utilisateurs inactifs</p>
+        <h2>{{ utilisateursInactifs }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">🔐</div>
+
+      <div>
+        <p>Administrateurs</p>
+        <h2>{{ administrateurs }}</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FORMULAIRE -->
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <div class="form-header">
+
+        <div>
+          <h2>
+            {{ modeModification
+              ? 'Modifier utilisateur'
+              : 'Ajouter un utilisateur'
+            }}
+          </h2>
+
+          <p>
+            {{ modeModification
+              ? 'Modifier les informations de l’utilisateur'
+              : 'Créer un nouveau compte utilisateur'
+            }}
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- NOM -->
+        <div class="form-group">
+
+          <label>Nom complet *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="nom"
+            placeholder="Ex : Ahmed Ben Ali"
+          />
+
+        </div>
+
+
+        <!-- EMAIL -->
+        <div class="form-group">
+
+          <label>Email *</label>
+
+          <input
+            type="email"
+            [(ngModel)]="email"
+            placeholder="Ex : exemple@plateforme-si.tn"
+          />
+
+        </div>
+
+
+        <!-- ROLE -->
+        <div class="form-group">
+
+          <label>Rôle *</label>
+
+          <select [(ngModel)]="role">
+
+            <option value="Administrateur">
+              Administrateur
+            </option>
+
+            <option value="Chef de projet">
+              Chef de projet
+            </option>
+
+            <option value="RH">
+              RH
+            </option>
+
+            <option value="Utilisateur">
+              Utilisateur
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- STATUT -->
+        <div class="form-group">
+
+          <label>Statut *</label>
+
+          <select [(ngModel)]="statut">
+
+            <option value="Actif">
+              Actif
+            </option>
+
+            <option value="Inactif">
+              Inactif
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOUTONS -->
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()"
+        >
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="enregistrerUtilisateur()"
+        >
+          {{ modeModification ? 'Modifier' : 'Enregistrer' }}
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- LISTE UTILISATEURS -->
+  <div class="users-card">
+
+    <!-- HEADER TABLEAU -->
+    <div class="table-header">
+
+      <div>
+        <h2>Utilisateurs</h2>
+        <p>Liste des comptes de la plateforme</p>
+      </div>
+
+
+      <!-- FILTRES -->
+      <div class="filters">
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="recherche"
+          placeholder="Rechercher..."
+        />
+
+
+        <select
+          class="filter-select"
+          [(ngModel)]="filtreRole"
+        >
+
+          <option value="Tous">
+            Tous les rôles
+          </option>
+
+          <option value="Administrateur">
+            Administrateur
+          </option>
+
+          <option value="Chef de projet">
+            Chef de projet
+          </option>
+
+          <option value="RH">
+            RH
+          </option>
+
+          <option value="Utilisateur">
+            Utilisateur
+          </option>
+
+        </select>
+
+
+        <select
+          class="filter-select"
+          [(ngModel)]="filtreStatut"
+        >
+
+          <option value="Tous">
+            Tous les statuts
+          </option>
+
+          <option value="Actif">
+            Actif
+          </option>
+
+          <option value="Inactif">
+            Inactif
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLEAU -->
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Utilisateur</th>
+
+            <th>Email</th>
+
+            <th>Rôle</th>
+
+            <th>Statut</th>
+
+            <th>Dernière connexion</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            utilisateur of utilisateursFiltres;
+            track utilisateur.id
+          ) {
+
+            <tr>
+
+              <!-- UTILISATEUR -->
+              <td>
+
+                <div class="user-name">
+
+                  <div class="avatar">
+                    {{ utilisateur.nom.charAt(0) }}
+                  </div>
+
+                  <strong>
+                    {{ utilisateur.nom }}
+                  </strong>
+
+                </div>
+
+              </td>
+
+
+              <!-- EMAIL -->
+              <td>
+                {{ utilisateur.email }}
+              </td>
+
+
+              <!-- ROLE -->
+              <td>
+
+                <span class="role-badge">
+                  {{ utilisateur.role }}
+                </span>
+
+              </td>
+
+
+              <!-- STATUT -->
+              <td>
+
+                <span
+                  class="status"
+                  [class.active]="utilisateur.statut === 'Actif'"
+                  [class.inactive]="utilisateur.statut === 'Inactif'"
+                >
+                  {{ utilisateur.statut }}
+                </span>
+
+              </td>
+
+
+              <!-- DERNIÈRE CONNEXION -->
+              <td>
+                {{ utilisateur.derniereConnexion }}
+              </td>
+
+
+              <!-- ACTIONS -->
+              <td>
+
+                <div class="actions">
+
+                  <button
+                    class="edit-button"
+                    title="Modifier"
+                    (click)="modifierUtilisateur(utilisateur)"
+                  >
+                    ✏️
+                  </button>
+
+                  <button
+                    class="delete-button"
+                    title="Supprimer"
+                    (click)="supprimerUtilisateur(utilisateur.id)"
+                  >
+                    🗑️
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+
+          <!-- AUCUN RÉSULTAT -->
+          @if (utilisateursFiltres.length === 0) {
+
+            <tr>
+
+              <td
+                colspan="6"
+                class="empty-message"
+              >
+                Aucun utilisateur trouvé.
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

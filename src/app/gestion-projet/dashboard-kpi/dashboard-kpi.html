@@ -1,0 +1,347 @@
+<div class="kpi-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+
+    <div>
+      <h1>Dashboard KPI</h1>
+      <p>Vue globale des indicateurs de performance des projets</p>
+    </div>
+
+  </div>
+
+
+  <!-- KPI PRINCIPAUX -->
+  <div class="kpi-grid">
+
+    <!-- CHIFFRE D'AFFAIRES -->
+    <div class="kpi-card">
+
+      <div class="kpi-icon">
+        💰
+      </div>
+
+      <div class="kpi-content">
+
+        <p>Budget total</p>
+
+        <h2>
+          {{ formatMontant(chiffreAffaires) }}
+        </h2>
+
+        <span>
+          Budget global des projets
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- CONSOMMÉ -->
+    <div class="kpi-card">
+
+      <div class="kpi-icon">
+        💳
+      </div>
+
+      <div class="kpi-content">
+
+        <p>Budget consommé</p>
+
+        <h2>
+          {{ formatMontant(totalConsomme) }}
+        </h2>
+
+        <span>
+          {{ pourcentageConsomme }}% du budget
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- AVANCEMENT -->
+    <div class="kpi-card">
+
+      <div class="kpi-icon">
+        📊
+      </div>
+
+      <div class="kpi-content">
+
+        <p>Avancement moyen</p>
+
+        <h2>
+          {{ avancementMoyen }}%
+        </h2>
+
+        <span>
+          Progression globale
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- PROJETS -->
+    <div class="kpi-card">
+
+      <div class="kpi-icon">
+        📁
+      </div>
+
+      <div class="kpi-content">
+
+        <p>Total projets</p>
+
+        <h2>
+          {{ totalProjets }}
+        </h2>
+
+        <span>
+          {{ projetsEnCours }} en cours
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- DEUXIÈME LIGNE -->
+  <div class="summary-grid">
+
+    <!-- BUDGET RESTANT -->
+    <div class="summary-card">
+
+      <div class="summary-header">
+
+        <div>
+          <h2>Budget restant</h2>
+          <p>Montant disponible</p>
+        </div>
+
+        <strong>
+          {{ formatMontant(budgetRestant) }}
+        </strong>
+
+      </div>
+
+
+      <div class="progress-bar">
+
+        <div
+          class="progress"
+          [style.width.%]="pourcentageConsomme"
+        ></div>
+
+      </div>
+
+
+      <div class="progress-info">
+
+        <span>
+          {{ pourcentageConsomme }}% consommé
+        </span>
+
+        <span>
+          {{ 100 - pourcentageConsomme }}% restant
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- STATUT PROJETS -->
+    <div class="summary-card">
+
+      <div class="summary-header">
+
+        <div>
+          <h2>Statut des projets</h2>
+          <p>Répartition actuelle</p>
+        </div>
+
+      </div>
+
+
+      <div class="status-list">
+
+        <div class="status-row">
+
+          <div class="status-label">
+
+            <span class="status-dot in-progress"></span>
+
+            <span>En cours</span>
+
+          </div>
+
+          <strong>
+            {{ projetsEnCours }}
+          </strong>
+
+        </div>
+
+
+        <div class="status-row">
+
+          <div class="status-label">
+
+            <span class="status-dot completed"></span>
+
+            <span>Terminés</span>
+
+          </div>
+
+          <strong>
+            {{ projetsTermines }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- TABLEAU DES PROJETS -->
+  <div class="projects-card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Performance des projets</h2>
+        <p>Suivi du budget et de l'avancement</p>
+      </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Projet</th>
+
+            <th>Responsable</th>
+
+            <th>Budget</th>
+
+            <th>Consommé</th>
+
+            <th>Avancement</th>
+
+            <th>Statut</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (projet of projets; track projet.id) {
+
+            <tr>
+
+              <!-- PROJET -->
+              <td>
+
+                <strong>
+                  {{ projet.nom }}
+                </strong>
+
+              </td>
+
+
+              <!-- RESPONSABLE -->
+              <td>
+                {{ projet.chefProjet }}
+              </td>
+
+
+              <!-- BUDGET -->
+              <td>
+                {{ formatMontant(projet.budget) }}
+              </td>
+
+
+              <!-- CONSOMMÉ -->
+              <td>
+
+                <div class="consomme">
+
+                  <span>
+                    {{ formatMontant(projet.consomme) }}
+                  </span>
+
+                  <small>
+  {{ getPourcentageProjet(projet) }}% du budget
+</small>
+
+                </div>
+
+              </td>
+
+
+              <!-- AVANCEMENT -->
+              <td>
+
+                <div class="project-progress">
+
+                  <div class="progress-track">
+
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="projet.avancement"
+                    ></div>
+
+                  </div>
+
+                  <span>
+                    {{ projet.avancement }}%
+                  </span>
+
+                </div>
+
+              </td>
+
+
+              <!-- STATUT -->
+              <td>
+
+                <span
+                  class="status"
+                  [class.in-progress]="projet.statut === 'En cours'"
+                  [class.completed]="projet.statut === 'Terminé'"
+                >
+                  {{ projet.statut }}
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

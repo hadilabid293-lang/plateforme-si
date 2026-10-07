@@ -1,0 +1,104 @@
+<div class="dashboard">
+
+  <div class="dashboard-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Vue globale de la plateforme SI</p>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-info">
+        <p>Chiffre d'affaires</p>
+        <h2>{{ formatMontant(chiffreAffaires) }}</h2>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">⏱️</div>
+      <div class="kpi-info">
+        <p>Consommé</p>
+        <h2>{{ pourcentageConsomme }}%</h2>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-info">
+        <p>Avancement projets</p>
+        <h2>{{ avancementMoyen }}%</h2>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-info">
+        <p>Employés</p>
+        <h2>{{ totalEmployes }}</h2>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dashboard-sections">
+
+    <div class="section-card">
+      <h2>Projets en cours</h2>
+
+      @if (projetsEnCours.length === 0) {
+
+        <p>Aucun projet en cours.</p>
+
+      } @else {
+
+        @for (projet of projetsEnCours; track projet.id) {
+
+          <div class="project">
+
+            <div class="project-info">
+              <span>{{ projet.nom }}</span>
+              <span>{{ getPourcentageProjet(projet) }}%</span>
+            </div>
+
+            <div class="progress-bar">
+              <div
+                class="progress"
+                [style.width.%]="getPourcentageProjet(projet)">
+              </div>
+            </div>
+
+          </div>
+
+        }
+
+      }
+
+    </div>
+
+    <div class="section-card">
+
+      <h2>Informations RH</h2>
+
+      <div class="info-row">
+        <span>Congés en attente</span>
+        <strong>{{ congesEnAttente }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Présents aujourd'hui</span>
+        <strong>{{ presentsAujourdHui }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Absents aujourd'hui</span>
+        <strong>{{ absentsAujourdHui }}</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

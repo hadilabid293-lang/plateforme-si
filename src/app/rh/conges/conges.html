@@ -1,0 +1,385 @@
+<div class="conges-page">
+
+  <!-- En-tête -->
+  <div class="page-header">
+
+    <div>
+      <h1>Gestion des congés</h1>
+      <p>Gestion et suivi des demandes de congé des employés</p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="ouvrirFormulaire()"
+    >
+      + Nouvelle demande
+    </button>
+
+  </div>
+
+
+  <!-- Formulaire -->
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <h2>
+        {{ modeModification ? 'Modifier une demande' : 'Nouvelle demande de congé' }}
+      </h2>
+
+
+      <div class="form-grid">
+
+        <!-- Employé -->
+        <div class="form-group">
+
+          <label>Employé *</label>
+
+          <select [(ngModel)]="employeId">
+  <option [ngValue]="0">Sélectionner un employé</option>
+
+  @for (employeItem of employes; track employeItem.id) {
+    <option [ngValue]="employeItem.id">
+      {{ employeItem.nom }} {{ employeItem.prenom }}
+    </option>
+  }
+</select>
+
+        </div>
+
+
+        <!-- Type -->
+        <div class="form-group">
+
+          <label>Type de congé *</label>
+
+          <select [(ngModel)]="type">
+
+            <option value="Congé annuel">
+              Congé annuel
+            </option>
+
+            <option value="Congé maladie">
+              Congé maladie
+            </option>
+
+            <option value="Congé exceptionnel">
+              Congé exceptionnel
+            </option>
+
+            <option value="Congé sans solde">
+              Congé sans solde
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Date début -->
+        <div class="form-group">
+
+          <label>Date de début *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateDebut"
+          >
+
+        </div>
+
+
+        <!-- Date fin -->
+        <div class="form-group">
+
+          <label>Date de fin *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateFin"
+          >
+
+        </div>
+
+
+        <!-- Nombre de jours -->
+        <div class="form-group">
+
+          <label>Nombre de jours</label>
+
+          <input
+            type="text"
+            [value]="calculerJours()"
+            readonly
+          >
+
+        </div>
+
+
+        <!-- Motif -->
+        <div class="form-group full-width">
+
+          <label>Motif</label>
+
+          <textarea
+            [(ngModel)]="motif"
+            placeholder="Motif de la demande..."
+            rows="4"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <!-- Boutons -->
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()"
+        >
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="ajouterConge()"
+        >
+          {{ modeModification ? 'Enregistrer' : 'Ajouter' }}
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- Statistiques -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+
+      <span class="stat-icon">📋</span>
+
+      <div>
+        <p>Total demandes</p>
+        <h2>{{ totalDemandes }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <span class="stat-icon">⏳</span>
+
+      <div>
+        <p>En attente</p>
+        <h2>{{ demandesEnAttente }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <span class="stat-icon">✅</span>
+
+      <div>
+        <p>Approuvées</p>
+        <h2>{{ demandesApprouvees }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <span class="stat-icon">❌</span>
+
+      <div>
+        <p>Refusées</p>
+        <h2>{{ demandesRefusees }}</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Tableau -->
+  <div class="conges-card">
+
+    <!-- Recherche + filtre -->
+    <div class="table-header">
+
+      <h2>Demandes de congé</h2>
+
+      <div class="filters">
+
+        <input
+          type="text"
+          placeholder="Rechercher un employé..."
+          class="search-input"
+          [(ngModel)]="recherche"
+        >
+
+
+        <select
+          class="status-filter"
+          [(ngModel)]="filtreStatut"
+        >
+
+          <option value="Tous">
+            Tous
+          </option>
+
+          <option value="En attente">
+            En attente
+          </option>
+
+          <option value="Approuvé">
+            Approuvé
+          </option>
+
+          <option value="Refusé">
+            Refusé
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- Tableau -->
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Employé</th>
+
+          <th>Type</th>
+
+          <th>Date début</th>
+
+          <th>Date fin</th>
+
+          <th>Jours</th>
+
+          <th>Motif</th>
+
+          <th>Statut</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        @for (conge of congesFiltres; track conge.id) {
+
+          <tr>
+
+            <td>
+              {{ conge.employe }}
+            </td>
+
+            <td>
+              {{ conge.type }}
+            </td>
+
+            <td>
+              {{ conge.dateDebut }}
+            </td>
+
+            <td>
+              {{ conge.dateFin }}
+            </td>
+
+            <td>
+              {{ conge.nombreJours }}
+            </td>
+
+            <td>
+              {{ conge.motif || '--' }}
+            </td>
+
+            <td>
+
+              <span
+                class="status"
+                [class.pending]="conge.statut === 'En attente'"
+                [class.approved]="conge.statut === 'Approuvé'"
+                [class.refused]="conge.statut === 'Refusé'"
+              >
+                {{ conge.statut }}
+              </span>
+
+            </td>
+
+
+            <td class="actions">
+
+              <!-- Approuver -->
+              @if (conge.statut === 'En attente') {
+
+                <button
+                  class="approve-button"
+                  (click)="approuverConge(conge.id)"
+                  title="Approuver"
+                >
+                  ✓
+                </button>
+
+                <button
+                  class="refuse-button"
+                  (click)="refuserConge(conge.id)"
+                  title="Refuser"
+                >
+                  ✕
+                </button>
+
+              }
+
+
+              <!-- Modifier -->
+              <button
+                class="edit-button"
+                (click)="modifierConge(conge)"
+                title="Modifier"
+              >
+                ✏️
+              </button>
+
+
+              <!-- Supprimer -->
+              <button
+                class="delete-button"
+                (click)="supprimerConge(conge.id)"
+                title="Supprimer"
+              >
+                🗑️
+              </button>
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

@@ -1,0 +1,345 @@
+<div class="timesheet-page">
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+
+    <div>
+      <h1>Gestion Timesheet</h1>
+      <p>Suivi du temps travaillé sur les projets</p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="ouvrirFormulaire()"
+    >
+      + Nouvelle saisie
+    </button>
+
+  </div>
+
+
+  <!-- FORMULAIRE -->
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <h2>
+        {{ modeModification ? 'Modifier une saisie' : 'Nouvelle saisie' }}
+      </h2>
+
+
+      <div class="form-grid">
+
+        <!-- DATE -->
+        <div class="form-group">
+
+          <label>Date *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="date"
+          >
+
+        </div>
+
+
+        <!-- EMPLOYÉ -->
+        <div class="form-group">
+
+          <label>Employé *</label>
+
+          <select [(ngModel)]="employeId">
+  <option [ngValue]="0">Sélectionner un employé</option>
+
+  @for (employeItem of employes; track employeItem.id) {
+    <option [ngValue]="employeItem.id">
+      {{ employeItem.nom }} {{ employeItem.prenom }}
+    </option>
+  }
+</select>
+
+        </div>
+
+
+        <!-- PROJET -->
+        <div class="form-group">
+
+          <label>Projet *</label>
+
+          <select [(ngModel)]="projet">
+
+            <option value="Projet ERP">
+              Projet ERP
+            </option>
+
+            <option value="Projet Mobile">
+              Projet Mobile
+            </option>
+
+            <option value="Projet Web">
+              Projet Web
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- HEURES -->
+        <div class="form-group">
+
+          <label>Nombre d'heures *</label>
+
+          <input
+            type="number"
+            [(ngModel)]="heures"
+            min="0.5"
+            max="24"
+            step="0.5"
+            placeholder="Ex : 8"
+          >
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+        <div class="form-group full-width">
+
+          <label>Description</label>
+
+          <textarea
+            [(ngModel)]="description"
+            rows="4"
+            placeholder="Décrivez le travail effectué..."
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOUTONS -->
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()"
+        >
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="enregistrerTimesheet()"
+        >
+          {{ modeModification ? 'Enregistrer' : 'Ajouter' }}
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- STATISTIQUES -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        ⏱️
+      </div>
+
+      <div>
+        <p>Total heures</p>
+        <h2>{{ totalHeures }} h</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        📋
+      </div>
+
+      <div>
+        <p>Nombre de saisies</p>
+        <h2>{{ nombreSaisies }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        📁
+      </div>
+
+      <div>
+        <p>Projets concernés</p>
+        <h2>{{ nombreProjets }}</h2>
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon">
+        📊
+      </div>
+
+      <div>
+        <p>Moyenne par saisie</p>
+        <h2>{{ moyenneHeures }} h</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- TABLEAU -->
+  <div class="timesheet-card">
+
+    <!-- HEADER TABLEAU -->
+    <div class="table-header">
+
+      <h2>Suivi des heures</h2>
+
+      <div class="filters">
+
+        <!-- RECHERCHE -->
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="recherche"
+          placeholder="Rechercher un employé..."
+        >
+
+
+        <!-- FILTRE PROJET -->
+        <select
+          class="project-filter"
+          [(ngModel)]="filtreProjet"
+        >
+
+          <option value="Tous">
+            Tous les projets
+          </option>
+
+          <option value="Projet ERP">
+            Projet ERP
+          </option>
+
+          <option value="Projet Mobile">
+            Projet Mobile
+          </option>
+
+          <option value="Projet Web">
+            Projet Web
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Date</th>
+
+          <th>Employé</th>
+
+          <th>Projet</th>
+
+          <th>Heures</th>
+
+          <th>Description</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        @for (entry of timesheetsFiltres; track entry.id) {
+
+          <tr>
+
+            <td>
+              {{ entry.date }}
+            </td>
+
+            <td>
+              <strong>{{ entry.employe }}</strong>
+            </td>
+
+            <td>
+
+              <span class="project-badge">
+                {{ entry.projet }}
+              </span>
+
+            </td>
+
+            <td>
+
+              <strong class="hours">
+                {{ entry.heures }} h
+              </strong>
+
+            </td>
+
+            <td>
+              {{ entry.description || '--' }}
+            </td>
+
+            <td class="actions">
+
+              <!-- MODIFIER -->
+              <button
+                class="edit-button"
+                (click)="modifierTimesheet(entry)"
+                title="Modifier"
+              >
+                ✏️
+              </button>
+
+
+              <!-- SUPPRIMER -->
+              <button
+                class="delete-button"
+                (click)="supprimerTimesheet(entry.id)"
+                title="Supprimer"
+              >
+                🗑️
+              </button>
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

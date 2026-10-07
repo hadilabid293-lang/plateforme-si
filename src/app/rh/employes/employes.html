@@ -1,0 +1,325 @@
+<div class="employees-page">
+
+  <div class="page-header">
+
+```
+<div>
+  <h1>Gestion des employés</h1>
+  <p>Gérer les employés de l'entreprise</p>
+</div>
+
+<button
+  type="button"
+  class="add-button"
+  (click)="ouvrirFormulaire()">
+  + Ajouter un employé
+</button>
+```
+
+  </div>
+
+  <div class="employees-card">
+
+```
+<div class="table-header">
+
+  <h2>Liste des employés</h2>
+
+  <div class="filters">
+
+    <input
+      type="text"
+      placeholder="Rechercher un employé..."
+      class="search-input"
+      [(ngModel)]="recherche">
+
+    <select
+      class="status-filter"
+      [(ngModel)]="statutFiltre">
+
+      <option value="Tous">Tous les statuts</option>
+      <option value="Actif">Actif</option>
+      <option value="Inactif">Inactif</option>
+
+    </select>
+
+  </div>
+
+</div>
+
+
+<div class="table-container">
+
+  <table>
+
+    <thead>
+
+      <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>Date d'embauche</th>
+        <th>Poste</th>
+        <th>Département</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+
+    </thead>
+
+
+    <tbody>
+
+      @for (employe of employesFiltres; track employe.id) {
+
+        <tr>
+
+          <td>{{ employe.nom }}</td>
+
+          <td>{{ employe.prenom }}</td>
+
+          <td>{{ employe.email }}</td>
+
+          <td>{{ employe.telephone }}</td>
+
+          <td>{{ employe.date_embauche }}</td>
+
+          <td>{{ employe.poste }}</td>
+
+          <td>{{ employe.departement }}</td>
+
+          <td>
+
+            <span
+              class="status"
+              [class.active]="employe.statut === 'Actif'"
+              [class.inactive]="employe.statut === 'Inactif'">
+
+              {{ employe.statut }}
+
+            </span>
+
+          </td>
+
+
+          <td class="actions">
+
+            <button
+              type="button"
+              class="edit-button"
+              (click)="modifierEmploye(employe)"
+              title="Modifier">
+
+              ✏️
+
+            </button>
+
+
+            <button
+              type="button"
+              class="delete-button"
+              (click)="supprimerEmploye(employe.id)"
+              title="Supprimer">
+
+              🗑️
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      }
+
+
+      @if (employesFiltres.length === 0) {
+
+        <tr>
+
+          <td
+            colspan="9"
+            class="empty-message">
+
+            Aucun employé trouvé.
+
+          </td>
+
+        </tr>
+
+      }
+
+    </tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+@if (showForm) {
+
+```
+<div class="form-card">
+
+  <div class="form-header">
+
+    <h2>
+      {{
+        modeModification
+          ? 'Modifier un employé'
+          : 'Ajouter un employé'
+      }}
+    </h2>
+
+    <button
+      type="button"
+      class="close-button"
+      (click)="fermerFormulaire()">
+
+      ✕
+
+    </button>
+
+  </div>
+
+
+  <div class="form-grid">
+
+    <div class="form-group">
+
+      <label>Nom</label>
+
+      <input
+        type="text"
+        placeholder="Ex : Ben Ali"
+        [(ngModel)]="nom">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Prénom</label>
+
+      <input
+        type="text"
+        placeholder="Ex : Ahmed"
+        [(ngModel)]="prenom">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Email</label>
+
+      <input
+        type="email"
+        placeholder="Ex : ahmed@entreprise.com"
+        [(ngModel)]="email">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Téléphone</label>
+
+      <input
+        type="tel"
+        placeholder="Ex : 22123456"
+        [(ngModel)]="telephone">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Date d'embauche</label>
+
+      <input
+        type="date"
+        [(ngModel)]="date_embauche">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Poste</label>
+
+      <input
+        type="text"
+        placeholder="Ex : Développeur"
+        [(ngModel)]="poste">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Département</label>
+
+      <select [(ngModel)]="departement">
+
+        <option value="">Sélectionner</option>
+
+        <option value="IT">IT</option>
+
+        <option value="RH">
+          Ressources Humaines
+        </option>
+
+        <option value="Projet">
+          Projet
+        </option>
+
+        <option value="Maintenance">
+          Maintenance
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <div class="form-actions">
+
+    <button
+      type="button"
+      class="cancel-button"
+      (click)="fermerFormulaire()">
+
+      Annuler
+
+    </button>
+
+
+    <button
+      type="button"
+      class="save-button"
+      (click)="ajouterEmploye()">
+
+      {{
+        modeModification
+          ? 'Enregistrer les modifications'
+          : 'Ajouter'
+      }}
+
+    </button>
+
+  </div>
+
+</div>
+
+
+}
+
+</div>
+
+
+

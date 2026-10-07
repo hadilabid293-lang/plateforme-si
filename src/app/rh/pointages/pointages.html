@@ -1,0 +1,382 @@
+<div class="pointages-page">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Gestion des pointages</h1>
+      <p>Suivi des présences et des horaires des employés</p>
+    </div>
+
+    <button
+      type="button"
+      class="add-button"
+      (click)="ouvrirFormulaire()"
+    >
+      + Ajouter un pointage
+    </button>
+
+  </div>
+
+
+  <!-- KPI -->
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-icon">👥</div>
+      <div>
+        <span>Total employés</span>
+        <strong>{{ totalEmployes }}</strong>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">✓</div>
+      <div>
+        <span>Présents</span>
+        <strong>{{ presents }}</strong>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">⏰</div>
+      <div>
+        <span>Retards</span>
+        <strong>{{ retards }}</strong>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">✕</div>
+      <div>
+        <span>Absents</span>
+        <strong>{{ absents }}</strong>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Liste -->
+
+  <div class="pointages-card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Pointages du jour</h2>
+        <p>Liste des pointages enregistrés</p>
+      </div>
+
+      <div class="filters">
+
+        <input
+          type="text"
+          placeholder="Rechercher un employé..."
+          class="search-input"
+          [(ngModel)]="recherche"
+        >
+
+        <select
+          class="status-filter"
+          [(ngModel)]="statutFiltre"
+        >
+          <option value="Tous">Tous</option>
+          <option value="Présent">Présent</option>
+          <option value="Retard">Retard</option>
+          <option value="Absent">Absent</option>
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Employé</th>
+            <th>Date</th>
+            <th>Arrivée</th>
+            <th>Départ</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          @for (pointage of pointagesFiltres; track pointage.id) {
+
+            <tr>
+
+              <td>
+                <div class="employee-name">
+                  <strong>
+                    {{ pointage.employe_prenom }}
+                    {{ pointage.employe_nom }}
+                  </strong>
+                </div>
+              </td>
+
+              <td>
+                {{ pointage.date_pointage }}
+              </td>
+
+              <td>
+                {{ pointage.heure_arrivee || '--' }}
+              </td>
+
+              <td>
+                {{ pointage.heure_depart || '--' }}
+              </td>
+
+              <td>
+
+                <span
+                  class="status"
+                  [class.present]="pointage.statut === 'Présent'"
+                  [class.late]="pointage.statut === 'Retard'"
+                  [class.absent]="pointage.statut === 'Absent'"
+                >
+                  {{ pointage.statut }}
+                </span>
+
+              </td>
+
+              <td class="actions">
+
+                <button
+                  type="button"
+                  class="edit-button"
+                  (click)="modifierPointage(pointage)"
+                  title="Modifier"
+                >
+                  ✏️
+                </button>
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  (click)="supprimerPointage(pointage.id)"
+                  title="Supprimer"
+                >
+                  🗑️
+                </button>
+
+              </td>
+
+            </tr>
+
+          }
+
+          @if (pointagesFiltres.length === 0) {
+
+            <tr>
+
+              <td
+                colspan="6"
+                class="empty-message"
+              >
+                Aucun pointage trouvé.
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- Formulaire -->
+
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <div class="form-header">
+
+        <div>
+          <h2>
+            {{
+              modeModification
+                ? 'Modifier un pointage'
+                : 'Ajouter un pointage'
+            }}
+          </h2>
+
+          <p>
+            {{
+              modeModification
+                ? 'Modifier les informations du pointage'
+                : 'Enregistrer un nouveau pointage'
+            }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="close-button"
+          (click)="fermerFormulaire()"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- Employé -->
+
+        <div class="form-group">
+
+          <label for="employe">
+            Employé
+          </label>
+
+          <select
+            id="employe"
+            [(ngModel)]="employe_id"
+          >
+
+            <option [ngValue]="null">
+              Sélectionner un employé
+            </option>
+
+            @for (employe of employes; track employe.id) {
+
+              <option [ngValue]="employe.id">
+                {{ employe.prenom }} {{ employe.nom }}
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+
+        <!-- Date -->
+
+        <div class="form-group">
+
+          <label for="date">
+            Date
+          </label>
+
+          <input
+            id="date"
+            type="date"
+            [(ngModel)]="date_pointage"
+          >
+
+        </div>
+
+
+        <!-- Arrivée -->
+
+        <div class="form-group">
+
+          <label for="arrivee">
+            Heure d'arrivée
+          </label>
+
+          <input
+            id="arrivee"
+            type="time"
+            [(ngModel)]="heure_arrivee"
+          >
+
+        </div>
+
+
+        <!-- Départ -->
+
+        <div class="form-group">
+
+          <label for="depart">
+            Heure de départ
+          </label>
+
+          <input
+            id="depart"
+            type="time"
+            [(ngModel)]="heure_depart"
+          >
+
+        </div>
+
+
+        <!-- Statut -->
+
+        <div class="form-group">
+
+          <label for="statut">
+            Statut
+          </label>
+
+          <select
+            id="statut"
+            [(ngModel)]="statut"
+          >
+
+            <option value="Présent">
+              Présent
+            </option>
+
+            <option value="Retard">
+              Retard
+            </option>
+
+            <option value="Absent">
+              Absent
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="cancel-button"
+          (click)="fermerFormulaire()"
+        >
+          Annuler
+        </button>
+
+        <button
+          type="button"
+          class="save-button"
+          (click)="enregistrerPointage()"
+        >
+          {{
+            modeModification
+              ? 'Enregistrer les modifications'
+              : 'Ajouter'
+          }}
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

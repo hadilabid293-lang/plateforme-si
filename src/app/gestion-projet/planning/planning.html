@@ -1,0 +1,294 @@
+<div class="planning-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Gestion du planning</h1>
+      <p>Planification et suivi des activités des projets</p>
+    </div>
+
+    <button class="add-button" (click)="ouvrirFormulaire()">
+      + Nouveau planning
+    </button>
+  </div>
+
+  @if (showForm) {
+
+    <div class="form-card">
+
+      <h2>
+        {{ modeModification ? 'Modifier le planning' : 'Nouveau planning' }}
+      </h2>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Projet *</label>
+
+          <select [(ngModel)]="projetId">
+            <option [ngValue]="0">
+              Sélectionner un projet
+            </option>
+
+            @for (projetItem of projets; track projetItem.id) {
+              <option [ngValue]="projetItem.id">
+                {{ projetItem.nom }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Titre *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="titre"
+            placeholder="Ex : Développement du module RH">
+        </div>
+
+        <div class="form-group">
+          <label>Responsable</label>
+
+          <input
+            type="text"
+            [(ngModel)]="responsable"
+            placeholder="Nom du responsable">
+        </div>
+
+        <div class="form-group">
+          <label>Statut</label>
+
+          <select [(ngModel)]="statut">
+            <option value="Planifié">Planifié</option>
+            <option value="En cours">En cours</option>
+            <option value="Terminé">Terminé</option>
+            <option value="Annulé">Annulé</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Date de début *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateDebut">
+        </div>
+
+        <div class="form-group">
+          <label>Date de fin *</label>
+
+          <input
+            type="date"
+            [(ngModel)]="dateFin">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Description</label>
+
+          <textarea
+            [(ngModel)]="description"
+            placeholder="Description du planning..."
+            rows="4"></textarea>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          class="cancel-button"
+          (click)="fermerFormulaire()">
+          Annuler
+        </button>
+
+        <button
+          class="save-button"
+          (click)="enregistrerPlanning()">
+
+          {{ modeModification ? 'Modifier' : 'Enregistrer' }}
+
+        </button>
+
+      </div>
+
+    </div>
+  }
+
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+
+      <div>
+        <p>Total plannings</p>
+        <h2>{{ totalPlannings }}</h2>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+
+      <div>
+        <p>Planifiés</p>
+        <h2>{{ planningsPlanifies }}</h2>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🔄</div>
+
+      <div>
+        <p>En cours</p>
+        <h2>{{ planningsEnCours }}</h2>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+
+      <div>
+        <p>Terminés</p>
+        <h2>{{ planningsTermines }}</h2>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="planning-card">
+
+    <div class="table-header">
+
+      <h2>Liste du planning</h2>
+
+      <div class="filters">
+
+        <input
+          class="search-input"
+          type="text"
+          [(ngModel)]="recherche"
+          placeholder="Rechercher un planning, projet ou responsable...">
+
+        <select
+          class="status-filter"
+          [(ngModel)]="filtreStatut">
+
+          <option value="Tous">Tous les statuts</option>
+          <option value="Planifié">Planifié</option>
+          <option value="En cours">En cours</option>
+          <option value="Terminé">Terminé</option>
+          <option value="Annulé">Annulé</option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Planning</th>
+          <th>Projet</th>
+          <th>Responsable</th>
+          <th>Date début</th>
+          <th>Date fin</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        @for (planning of planningsFiltres; track planning.id) {
+
+          <tr>
+
+            <td>
+              <strong>{{ planning.titre }}</strong>
+
+              @if (planning.description) {
+                <div class="description">
+                  {{ planning.description }}
+                </div>
+              }
+            </td>
+
+            <td>
+              <span class="project-badge">
+                {{ planning.projet_nom }}
+              </span>
+            </td>
+
+            <td>
+              {{ planning.responsable || '-' }}
+            </td>
+
+            <td>
+              {{ planning.date_debut }}
+            </td>
+
+            <td>
+              {{ planning.date_fin }}
+            </td>
+
+            <td>
+
+              <span
+                class="status-badge"
+                [class.planifie]="planning.statut === 'Planifié'"
+                [class.en-cours]="planning.statut === 'En cours'"
+                [class.termine]="planning.statut === 'Terminé'"
+                [class.annule]="planning.statut === 'Annulé'">
+
+                {{ planning.statut }}
+
+              </span>
+
+            </td>
+
+            <td class="actions">
+
+              <button
+                class="edit-button"
+                title="Modifier"
+                (click)="modifierPlanning(planning)">
+                ✏️
+              </button>
+
+              <button
+                class="delete-button"
+                title="Supprimer"
+                (click)="supprimerPlanning(planning.id)">
+                🗑️
+              </button>
+
+            </td>
+
+          </tr>
+
+        }
+
+        @if (planningsFiltres.length === 0) {
+
+          <tr>
+
+            <td
+              colspan="7"
+              style="text-align: center; padding: 30px;">
+
+              Aucun planning trouvé.
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
